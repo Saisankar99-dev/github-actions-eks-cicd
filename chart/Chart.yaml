@@ -1,0 +1,4 @@
+apiVersion: v2
+name: myapp-python
+description: Flask app deployed via Jenkins → Helm → EKS
+version: 0.1.0
