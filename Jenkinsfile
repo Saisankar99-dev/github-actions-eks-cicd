@@ -21,8 +21,8 @@ pipeline {
         script {
           // Define IMAGE_TAG explicitly using Windows-compatible syntax
           def IMAGE_TAG = bat(script: "git rev-parse --short HEAD", returnStdout: true).trim()
-          
-          // Debugging: Print the IMAGE_TAG value
+
+          // Debugging: Print the IMAGE_TAG value to verify
           echo "Generated IMAGE_TAG: ${IMAGE_TAG}"
 
           // login & push to Docker registry (use bat for Windows)
