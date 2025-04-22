@@ -1,0 +1,69 @@
+name: CI/CD to EKS using Docker Registry
+
+on:
+  push:
+    branches:
+      - '*'  # This means trigger on all branches
+    paths-ignore:
+      - '.github/workflows/**'  # Ignore changes within the .github/workflows directory
+
+
+env:
+  AWS_REGION: us-east-1
+  CLUSTER_NAME: my-eks-cluster
+  DOCKER_REGISTRY: docker.io
+  DOCKER_REPO: saisankar99/ultimate-flask-app
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.10
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.DOCKER_REGISTRY }}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Set image tag
+        id: vars
+        run: echo "IMAGE_TAG=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+
+      - name: Build and Push Docker image
+        run: |
+          docker build -t $DOCKER_REGISTRY/$DOCKER_REPO:$IMAGE_TAG .
+          docker push $DOCKER_REGISTRY/$DOCKER_REPO:$IMAGE_TAG
+
+      # - name: Configure AWS credentials (for AssumeRole)
+      #   uses: aws-actions/configure-aws-credentials@v3
+      #   with:
+      #     role-to-assume: arn:aws:iam::123456789012:role/eks-deployment-role
+      #     aws-region: ${{ env.AWS_REGION }}
+
+      # - name: Update kubeconfig
+      #   run: |
+      #     aws eks update-kubeconfig --name $CLUSTER_NAME --region $AWS_REGION
+
+      # - name: Deploy with Helm
+      #   run: |
+      #     helm upgrade --install myapp-python ./chart \
+      #       --namespace default \
+      #       --set image.repository=$DOCKER_REGISTRY/$DOCKER_REPO \
+      #       --set image.tag=$IMAGE_TAG \
+      #       --wait
