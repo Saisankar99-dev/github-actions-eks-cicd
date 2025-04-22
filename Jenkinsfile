@@ -21,6 +21,9 @@ pipeline {
         script {
           // Define IMAGE_TAG explicitly using Windows-compatible syntax
           def IMAGE_TAG = bat(script: "git rev-parse --short HEAD", returnStdout: true).trim()
+          
+          // Debugging: Print the IMAGE_TAG value
+          echo "Generated IMAGE_TAG: ${IMAGE_TAG}"
 
           // login & push to Docker registry (use bat for Windows)
           withCredentials([usernamePassword(
@@ -29,8 +32,11 @@ pipeline {
             passwordVariable: 'DOCKER_PASS'
           )]) {
             bat """
+              echo Logging into Docker...
               docker login ${DOCKER_REGISTRY} -u %DOCKER_USER% -p %DOCKER_PASS%
+              echo Building Docker image with tag: ${DOCKER_REGISTRY}/${DOCKER_REPO}:${IMAGE_TAG}
               docker build -t ${DOCKER_REGISTRY}/${DOCKER_REPO}:${IMAGE_TAG} .
+              echo Pushing Docker image with tag: ${DOCKER_REGISTRY}/${DOCKER_REPO}:${IMAGE_TAG}
               docker push ${DOCKER_REGISTRY}/${DOCKER_REPO}:${IMAGE_TAG}
             """
           }
