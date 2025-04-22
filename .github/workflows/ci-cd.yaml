@@ -9,8 +9,8 @@ on:
 
 
 env:
-  AWS_REGION: us-east-1
-  CLUSTER_NAME: my-eks-cluster
+  AWS_REGION: ap-south-1
+  CLUSTER_NAME: demo_cluster
   DOCKER_REGISTRY: docker.io
   DOCKER_REPO: saisankar99/ultimate-flask-app
 
@@ -29,7 +29,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: 3.11
+          python-version: 3.10
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -50,20 +50,20 @@ jobs:
           docker build -t $DOCKER_REGISTRY/$DOCKER_REPO:$IMAGE_TAG .
           docker push $DOCKER_REGISTRY/$DOCKER_REPO:$IMAGE_TAG
 
-      # - name: Configure AWS credentials (for AssumeRole)
-      #   uses: aws-actions/configure-aws-credentials@v3
-      #   with:
-      #     role-to-assume: arn:aws:iam::123456789012:role/eks-deployment-role
-      #     aws-region: ${{ env.AWS_REGION }}
+      - name: Configure AWS credentials (for AssumeRole)
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          role-to-assume: arn:aws:iam::971422703426:role/GitHubEksRole
+          aws-region: ${{ env.AWS_REGION }}
 
-      # - name: Update kubeconfig
-      #   run: |
-      #     aws eks update-kubeconfig --name $CLUSTER_NAME --region $AWS_REGION
+      - name: Update kubeconfig
+        run: |
+          aws eks update-kubeconfig --name $CLUSTER_NAME --region $AWS_REGION
 
-      # - name: Deploy with Helm
-      #   run: |
-      #     helm upgrade --install myapp-python ./chart \
-      #       --namespace default \
-      #       --set image.repository=$DOCKER_REGISTRY/$DOCKER_REPO \
-      #       --set image.tag=$IMAGE_TAG \
-      #       --wait
+      - name: Deploy with Helm
+        run: |
+          helm upgrade --install myapp-python ./chart \
+            --namespace default \
+            --set image.repository=$DOCKER_REGISTRY/$DOCKER_REPO \
+            --set image.tag=$IMAGE_TAG \
+            --wait
