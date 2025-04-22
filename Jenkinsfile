@@ -4,7 +4,6 @@ pipeline {
   environment {
     AWS_REGION     = 'us-east-1'
     CLUSTER_NAME   = 'my-eks-cluster'
-    // Docker registry settings:
     DOCKER_REGISTRY = 'docker.io'
     DOCKER_REPO     = 'saisankar99/ultimate-flask-app'
     IMAGE_TAG       = ''
@@ -20,8 +19,8 @@ pipeline {
     stage('Build & Push Docker Image') {
       steps {
         script {
-          // derive a tag using Windows-compatible syntax (PowerShell)
-          IMAGE_TAG = bat(script: "git rev-parse --short HEAD", returnStdout: true).trim()
+          // Define IMAGE_TAG explicitly using Windows-compatible syntax
+          def IMAGE_TAG = bat(script: "git rev-parse --short HEAD", returnStdout: true).trim()
 
           // login & push to Docker registry (use bat for Windows)
           withCredentials([usernamePassword(
