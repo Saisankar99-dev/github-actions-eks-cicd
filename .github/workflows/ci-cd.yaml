@@ -10,7 +10,7 @@ on:
 
 env:
   AWS_REGION: ap-south-1
-  CLUSTER_NAME: demo_cluster
+  CLUSTER_NAME: demo-cluster
   DOCKER_REGISTRY: docker.io
   DOCKER_REPO: saisankar99/ultimate-flask-app
 
