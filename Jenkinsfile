@@ -6,7 +6,7 @@ pipeline {
     CLUSTER_NAME   = 'my-eks-cluster'
     DOCKER_REGISTRY = 'docker.io'
     DOCKER_REPO     = 'saisankar99/ultimate-flask-app'
-    IMAGE_TAG       = ''
+    IMAGE_TAG       = 'latest'
   }
 
   stages {
@@ -20,10 +20,10 @@ pipeline {
       steps {
         script {
           // Define IMAGE_TAG explicitly using Windows-compatible syntax
-          def IMAGE_TAG = bat(script: "git rev-parse --short HEAD", returnStdout: true).trim()
+        //   def IMAGE_TAG = bat(script: "git rev-parse --short HEAD", returnStdout: true).trim()
 
-          // Debugging: Print the IMAGE_TAG value to verify
-          echo "Generated IMAGE_TAG: ${IMAGE_TAG}"
+        //   // Debugging: Print the IMAGE_TAG value to verify
+        //   echo "Generated IMAGE_TAG: ${IMAGE_TAG}"
 
           // login & push to Docker registry (use bat for Windows)
           withCredentials([usernamePassword(
