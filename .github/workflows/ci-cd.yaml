@@ -67,3 +67,8 @@ jobs:
             --set image.repository=$DOCKER_REGISTRY/$DOCKER_REPO \
             --set image.tag=$IMAGE_TAG \
             --wait
+      - name: Roll back on failure
+        if: failure() && steps.deploy.outcome == 'failure'
+        run: |
+          echo "Deployment failed – rolling back to previous revision"
+          helm rollback myapp-python
